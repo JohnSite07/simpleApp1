@@ -1,7 +1,41 @@
 {% extends "home/base.html" %}
 {% load static %}
+
 {% block content %}
 
-<h1> Weight Tracker</h1>
+<section class="text-center bg-white p-10 rounded-lg shadow-lg mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Weight Tracker</h1>
+    <p1 class="text-lg text-gray-600">Enter your weight below.</p1>
+</section>
+
+<section class="bg-white p-6 rounded-lg shadow mb-8">
+    <h2 class="text-2xl font-semibold mb-4">Add a new entry</h2>
+    <form method="post" action="{% url 'weighttrackerhome' %}" novalidate>
+        {% csrf_token %}
+
+        {{ weight_form.as_p }}
+
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 ease-in-out">
+            Save Entry
+        </button>
+    </form>
+</section>
+
+<section>
+    <h2 class="text-2xl font-semibold mb-4">History</h2>
+    {% if entries %}
+        <ul class="list-disc pl-5 space-y-2">
+            {% for entry in entries %}
+                <li class="text-gray-700">
+                    {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg
+                </li>
+            {% empty %}
+                <li class="text-gray-500"> No entries yet.</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-gray-500"> No entries yet.</p>
+    {% endif %}
+</section>
 
 {% endblock content %}
