@@ -16,7 +16,7 @@ def weighttrakerhome(request):
     existing_entries = WeightTrackerElements.objects.all()
     entries = WeightTrackerElements.objects.order_by('date')
     dates = [entry.date.strftime("%Y-%m-%d") for entry in entries]
-    weights = [entry.weight_kg for entry in entries]
+    weights = [float(entry.weight_kg) for entry in entries]
 
     context = {
         'weight_form': weight_form,
