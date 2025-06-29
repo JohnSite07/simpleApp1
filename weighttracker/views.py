@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import WeightEntryForm
 from .models import WeightTrackerElements
+import json
 
 # Create your views here.
 def weighttrakerhome(request):
@@ -13,10 +14,16 @@ def weighttrakerhome(request):
         weight_form = WeightEntryForm()
     
     existing_entries = WeightTrackerElements.objects.all()
+    entries = WeightTrackerElements.objects.order_by('date')
+    dates = [entry.date.strftime("%Y-%m-%d") for entry in entries]
+    weights = [entry.weight_kg for entry in entries]
 
     context = {
         'weight_form': weight_form,
-        'entries': existing_entries
+        'entries': existing_entries,
+        'weight_entries': entries,
+        'chart_labels': json.dumps(dates),
+        'chart_data': json.dumps(weights)
     }
     return render(request, "weighttracker\weighttrackerhome.html", context)
 

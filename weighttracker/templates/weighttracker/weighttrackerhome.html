@@ -51,30 +51,71 @@
 
     <section class="bg-white p-6 rounded-lg shadow mb-8">
         <h2 class="text-2xl font-semibold mb-4">History</h2>
-        {% if entries %}
-            <ul class="list-disc pl-5 space-y-2">
-                {% for entry in entries %}
-                    <li class="flex items-center justify-between bg-gray-100 p-3 rounded shadow-sm">
-                        {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg - {{ entry.notes }}
-                        <form action="{% url 'delete_entry' entry.id %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button 
-                              type="submit"
-                              class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded shadow transition duration-200"
-                              onclick="return confirm('Delete this entry?')"
-                            >
-                                Remove
-                            </button>
-                        </form>
-                    </li>
-                {% empty %}
-                    <li class="text-gray-500"> No entries yet.</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="text-gray-500"> No entries yet.</p>
-        {% endif %}
+        <div class="max-h-96 overflow-y-auto border rounded p-3 bg-white shadow">
+            {% if entries %}
+                <ul class="list-disc pl-5 space-y-2">
+                    {% for entry in entries %}
+                        <li class="flex items-center justify-between bg-gray-100 p-3 rounded shadow-sm">
+                            {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg - {{ entry.notes }}
+                            <form action="{% url 'delete_entry' entry.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button 
+                                type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded shadow transition duration-200"
+                                onclick="return confirm('Delete this entry?')"
+                                >
+                                    Remove
+                                </button>
+                            </form>
+                        </li>
+                    {% empty %}
+                        <li class="text-gray-500"> No entries yet.</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-500"> No entries yet.</p>
+            {% endif %}
+        </div>
     </section>
 </div>
+<section class="bg-white p-6 rounded-lg shadow mb-8">
+    <h3 class="text-2xl font-semibold mb-4">Progress Chart</h3>
+    <div class="bg-white p-4 shadow rounded">
+        <canvas id="weightChart" height="100"></canvas>
+    </div>
+    <script>
+        const labels = {{ chart_labels|safe }};
+        const data = {
+          labels: labels,
+          datasets: [{
+            label: 'Weight (kg)',
+            data: {{ chart_data|safe }},
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.2,
+            pointRadius: 5,
+            pointHoverRadius: 7
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+            responsive: true,
+            plugins: {
+                legend: { display: true, position: 'top' },
+                tooltip: { enabled: true }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Date' }},
+                y: { title: { display: true, text: 'Weight (kg)' }}
+            }
+            }
+        };
+
+        new Chart(document.getElementById('weightChart'), config);
+    </script>
+</section>
 
 {% endblock content %}
