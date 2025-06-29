@@ -49,13 +49,23 @@
         </form>
     </section>
 
-    <section>
+    <section class="bg-white p-6 rounded-lg shadow mb-8">
         <h2 class="text-2xl font-semibold mb-4">History</h2>
         {% if entries %}
             <ul class="list-disc pl-5 space-y-2">
                 {% for entry in entries %}
-                    <li class="text-gray-700">
-                        {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg
+                    <li class="flex items-center justify-between bg-gray-100 p-3 rounded shadow-sm">
+                        {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg - {{ entry.notes }}
+                        <form action="{% url 'delete_entry' entry.id %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button 
+                              type="submit"
+                              class="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded shadow transition duration-200"
+                              onclick="return confirm('Delete this entry?')"
+                            >
+                                Remove
+                            </button>
+                        </form>
                     </li>
                 {% empty %}
                     <li class="text-gray-500"> No entries yet.</li>
