@@ -8,61 +8,63 @@
     <p1 class="text-lg text-gray-600">Enter your weight below.</p1>
 </section>
 
-<section class="bg-white p-6 rounded-lg shadow mb-8">
-    <h2 class="text-2xl font-semibold mb-4">Add a new entry</h2>
-    <form method="post" action="{% url 'weighttrackerhome' %}" novalidate>
-        {% csrf_token %}
+<div style="display: flex; gap: 2rem;">
+    <section class="bg-white p-6 rounded-lg shadow mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Add a new entry</h2>
+        <form method="post" action="{% url 'weighttrackerhome' %}" novalidate>
+            {% csrf_token %}
 
-        {# weight_form.as_p #}
+            {# weight_form.as_p #}
 
-        <div class="mb-4">
-            <lable for="{{ weight_form.date.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Date</lable>
-            {{ weight_form.date }}
-            {% if weight_form.date.errors %}
-                <p class="text-red-500 text-xs italic">{{ weight_form.date.errors|striptags }}</p>
-            {% endif %}
-        </div> 
-        <div class="mb-4">
-            <lable for="{{ weight_form.weight_kg.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg)</lable>
-            {{ weight_form.weight_kg }}
-            {% if weight_form.weight_kg.errors %}
-                <p class="text-red-500 text-xs italic">{{ weight_form.weight_kg.errors|striptags }}</p>
-            {% endif %}
-        </div>
-        <div class="mb-4">
-            <lable for="{{ weight_form.notes.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Notes</lable>
-            {{ weight_form.notes }}
-            {% if weight_form.notes.errors %}
-                <p class="text-red-500 text-xs italic">{{ weight_form.notes.errors|striptags }}</p>
-            {% endif %}
-        </div>
-        {% if form.non_field_errors %}
-            <div class="mb-4 text-red-500 text-sm">
-                {{ form.non_field_errors }}
+            <div class="mb-4">
+                <lable for="{{ weight_form.date.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Date</lable>
+                {{ weight_form.date }}
+                {% if weight_form.date.errors %}
+                    <p class="text-red-500 text-xs italic">{{ weight_form.date.errors|striptags }}</p>
+                {% endif %}
+            </div> 
+            <div class="mb-4">
+                <lable for="{{ weight_form.weight_kg.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Weight (kg)</lable>
+                {{ weight_form.weight_kg }}
+                {% if weight_form.weight_kg.errors %}
+                    <p class="text-red-500 text-xs italic">{{ weight_form.weight_kg.errors|striptags }}</p>
+                {% endif %}
             </div>
+            <div class="mb-4">
+                <lable for="{{ weight_form.notes.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Notes</lable>
+                {{ weight_form.notes }}
+                {% if weight_form.notes.errors %}
+                    <p class="text-red-500 text-xs italic">{{ weight_form.notes.errors|striptags }}</p>
+                {% endif %}
+            </div>
+            {% if form.non_field_errors %}
+                <div class="mb-4 text-red-500 text-sm">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 ease-in-out">
+                Save Entry
+            </button>
+        </form>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-semibold mb-4">History</h2>
+        {% if entries %}
+            <ul class="list-disc pl-5 space-y-2">
+                {% for entry in entries %}
+                    <li class="text-gray-700">
+                        {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg
+                    </li>
+                {% empty %}
+                    <li class="text-gray-500"> No entries yet.</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500"> No entries yet.</p>
         {% endif %}
-
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 ease-in-out">
-            Save Entry
-        </button>
-    </form>
-</section>
-
-<section>
-    <h2 class="text-2xl font-semibold mb-4">History</h2>
-    {% if entries %}
-        <ul class="list-disc pl-5 space-y-2">
-            {% for entry in entries %}
-                <li class="text-gray-700">
-                    {{ entry.date|date:"Y-m-d" }}: {{entry.weight_kg}} kg
-                </li>
-            {% empty %}
-                <li class="text-gray-500"> No entries yet.</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-gray-500"> No entries yet.</p>
-    {% endif %}
-</section>
+    </section>
+</div>
 
 {% endblock content %}

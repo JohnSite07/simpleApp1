@@ -1,0 +1,15 @@
+input[type="date"],
+input[type="number"],
+textarea {
+  border: 2px solid #888;
+  border-radius: 5px;
+  padding: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
