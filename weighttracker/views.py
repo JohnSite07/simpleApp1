@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from .forms import WeightEntryForm
 from .models import WeightTrackerElements
 import json
-from django.contrib.auth.decorators import login_required
+from typing import List
 
 # Create your views here.
 @login_required
@@ -29,7 +30,7 @@ def weighttrakerhome(request):
         'chart_labels': json.dumps(dates),
         'chart_data': json.dumps(weights)
     }
-    return render(request, "weighttracker\weighttrackerhome.html", context)
+    return render(request, "weighttracker/weighttrackerhome.html", context)
 
 # Delete entry
 @login_required
