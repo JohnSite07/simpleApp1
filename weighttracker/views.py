@@ -2,19 +2,23 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import WeightEntryForm
 from .models import WeightTrackerElements
 import json
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required
 def weighttrakerhome(request):
     if request.method == 'POST':
         weight_form = WeightEntryForm(request.POST)
         if weight_form.is_valid():
-            weight_form.save()
+            entry = weight_form.save(commit=False)
+            entry.user = request.user
+            entry.save()
             return redirect('weighttrackerhome')
     else:
         weight_form = WeightEntryForm()
     
-    existing_entries = WeightTrackerElements.objects.all()
-    entries = WeightTrackerElements.objects.order_by('date')
+    existing_entries = WeightTrackerElements.objects.filter(user=request.user)
+    entries = WeightTrackerElements.objects.filter(user=request.user).order_by('date')
     dates = [entry.date.strftime("%Y-%m-%d") for entry in entries]
     weights = [float(entry.weight_kg) for entry in entries]
 
@@ -28,7 +32,8 @@ def weighttrakerhome(request):
     return render(request, "weighttracker\weighttrackerhome.html", context)
 
 # Delete entry
+@login_required
 def delete_entry(request, entry_id):
-    entry = get_object_or_404(WeightTrackerElements, id=entry_id)
+    entry = get_object_or_404(WeightTrackerElements, id=entry_id, user=request.user)
     entry.delete()
     return redirect('weighttrackerhome')
