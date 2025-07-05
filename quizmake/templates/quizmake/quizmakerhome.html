@@ -1,0 +1,42 @@
+{% extends "home/base.html" %}
+{% block content %}
+<section class="text-center bg-white p-10 rounded-lg shadow-lg mb-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-4">Quiz Maker</h1>
+</section>
+
+<section class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow mb-8">
+    <h2 class="text-xl font-semibold mb-4">Upload Files (PDF, PPTX, etc.)</h2>
+    <form method="post" enctype="multipart/form-data" class="flex flex-col items-center gap-4">
+        {% csrf_token %}
+        <input type="file" name="upload_files" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.odt,.odp,.xls,.xlsx,.csv,.rtf,.html,.htm,.zip,.rar,.7z,.tar,.gz,.mp3,.mp4,.avi,.mov,.mkv,.wav,.flac,.ogg,.json,.xml,.md,.epub,.mobi,.azw3,.cbz,.cbr,.xps,.ps,.tex,.log,.tex,.pages,.key,.numbers,.heic,.tiff,.tif,.psd,.ai,.indd,.dwg,.dxf,.skp,.blend,.fbx,.obj,.stl,.3ds,.dae,.ply,.gltf,.glb,.usdz,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct">
+        <div class="flex flex-col gap-2 w-full">
+            <label class="font-medium">Quiz Type:</label>
+            <div class="flex gap-6">
+                <label class="inline-flex items-center">
+                    <input type="radio" name="quiz_type" value="flashcards" class="form-radio" checked>
+                    <span class="ml-2">Make Flash Cards</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="radio" name="quiz_type" value="multiple_choice" class="form-radio">
+                    <span class="ml-2">Make Multiple Choice</span>
+                </label>
+            </div>
+        </div>
+        <div class="flex flex-col gap-2 w-full">
+            <label for="num_questions" class="font-medium">Number of Questions:</label>
+            <input type="number" name="num_questions" id="num_questions" min="1" max="100" value="10" class="border rounded px-3 py-2 w-32">
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-300 ease-in-out">Confirm</button>
+    </form>
+    {% if uploaded_files %}
+        <div class="mt-6">
+            <h3 class="text-lg font-medium mb-2">Uploaded Files:</h3>
+            <ul class="list-disc list-inside text-left">
+                {% for file in uploaded_files %}
+                    <li>{{ file }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</section>
+{% endblock content %} 

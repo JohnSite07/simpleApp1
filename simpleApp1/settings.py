@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'home.apps.HomeConfig',
-    'weighttracker.apps.WeighttrackerConfig'
+    'weighttracker.apps.WeighttrackerConfig',
+    'quizmake.apps.QuizmakeConfig',
 ]
 
 MIDDLEWARE = [

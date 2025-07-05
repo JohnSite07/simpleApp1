@@ -31,7 +31,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col">
 
     <header class="bg-white shadow-md rounded-b-lg fixed top-0 left-0 w-full z-50">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
@@ -57,7 +57,7 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-6 py-12 mt-24">
+    <main class="container mx-auto px-6 py-12 mt-24 flex-1">
         {% if messages %}
             <div class="mb-6">
                 {% for message in messages %}
