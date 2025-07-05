@@ -33,7 +33,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <header class="bg-white shadow-md rounded-b-lg">
+    <header class="bg-white shadow-md rounded-b-lg fixed top-0 left-0 w-full z-50">
         <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
             <div>
                 <a href="#" class="text-xl font-semibold text-gray-700 hover:text-blue-600 rounded">Your Logo</a>
@@ -57,7 +57,7 @@
         </nav>
     </header>
 
-    <main class="container mx-auto px-6 py-12">
+    <main class="container mx-auto px-6 py-12 mt-24">
         {% if messages %}
             <div class="mb-6">
                 {% for message in messages %}

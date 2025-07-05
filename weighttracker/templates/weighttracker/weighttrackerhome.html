@@ -8,8 +8,8 @@
     <p1 class="text-lg text-gray-600">Enter your weight below.</p1>
 </section>
 
-<div style="display: flex; gap: 2rem;">
-    <section class="bg-white p-6 rounded-lg shadow mb-8">
+<div style="display: flex; justify-content: center; gap: 4rem; max-width: 1200px; margin: 0 auto;">
+    <section class="bg-white p-6 rounded-lg shadow mb-8 flex-1 max-w-md">
         <h2 class="text-2xl font-semibold mb-4">Add a new entry</h2>
         <form method="post" action="{% url 'weighttrackerhome' %}" novalidate>
             {% csrf_token %}
@@ -49,7 +49,7 @@
         </form>
     </section>
 
-    <section class="bg-white p-6 rounded-lg shadow mb-8">
+    <section class="bg-white p-6 rounded-lg shadow mb-8 flex-1 max-w-md">
         <h2 class="text-2xl font-semibold mb-4">History</h2>
         <div class="max-h-96 overflow-y-auto border rounded p-3 bg-white shadow">
             {% if entries %}
@@ -80,12 +80,46 @@
 </div>
 <section class="bg-white p-6 rounded-lg shadow mb-8">
     <h3 class="text-2xl font-semibold mb-4">Progress Chart</h3>
+    
+    <!-- Date Range Filter -->
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+        <h4 class="text-lg font-medium mb-3">Filter by Date Range</h4>
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div>
+                <label for="{{ filter_form.start_date.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">Start Date</label>
+                {{ filter_form.start_date }}
+            </div>
+            <div>
+                <label for="{{ filter_form.end_date.id_for_label }}" class="block text-gray-700 text-sm font-bold mb-2">End Date</label>
+                {{ filter_form.end_date }}
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 ease-in-out">
+                    Apply Filter
+                </button>
+                <a href="{% url 'weighttrackerhome' %}" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-300 ease-in-out">
+                    Clear Filter
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Scrollable Chart Container -->
     <div class="bg-white p-4 shadow rounded">
-        <canvas id="weightChart" height="100"></canvas>
+        <div class="overflow-x-auto w-full">
+            <canvas id="weightChart" height="300"></canvas>
+        </div>
     </div>
     <script>
         const labels = JSON.parse('{{ chart_labels|escapejs }}');
         const weights = JSON.parse('{{ chart_data|escapejs }}');
+        // Dynamically set canvas width: 80px per label, min 800px
+        const canvas = document.getElementById('weightChart');
+        const minWidth = 800;
+        const pxPerLabel = 80;
+        const dynamicWidth = Math.max(minWidth, labels.length * pxPerLabel);
+        canvas.width = dynamicWidth;
+        
         const data = {
           labels: labels,
           datasets: [{
@@ -103,19 +137,26 @@
             type: 'line',
             data: data,
             options: {
-            responsive: true,
+            responsive: false,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: true, position: 'top' },
                 tooltip: { enabled: true }
             },
             scales: {
-                x: { title: { display: true, text: 'Date' }},
+                x: { 
+                    title: { display: true, text: 'Date' },
+                    ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
+                    }
+                },
                 y: { title: { display: true, text: 'Weight (kg)' }}
             }
             }
         };
 
-        new Chart(document.getElementById('weightChart'), config);
+        new Chart(canvas, config);
     </script>
 </section>
 
