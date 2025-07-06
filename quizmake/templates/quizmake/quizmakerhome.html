@@ -1,42 +1,229 @@
 {% extends "home/base.html" %}
 {% block content %}
-<section class="text-center bg-white p-10 rounded-lg shadow-lg mb-8">
-    <h1 class="text-3xl font-bold text-gray-800 mb-4">Quiz Maker</h1>
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+    <div class="max-w-4xl mx-auto text-center px-4">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">AI-Powered Quiz Maker</h1>
+        <p class="text-xl mb-8 opacity-90">Upload your documents and let AI generate personalized quizzes and flashcards</p>
+        <div class="flex flex-wrap justify-center gap-4 text-sm">
+            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">PDF Support</span>
+            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">PPTX Support</span>
+            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">DOCX Support</span>
+            <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full">Multiple Formats</span>
+        </div>
+    </div>
 </section>
 
-<section class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow mb-8">
-    <h2 class="text-xl font-semibold mb-4">Upload Files (PDF, PPTX, etc.)</h2>
-    <form method="post" enctype="multipart/form-data" class="flex flex-col items-center gap-4">
-        {% csrf_token %}
-        <input type="file" name="upload_files" multiple accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.odt,.odp,.xls,.xlsx,.csv,.rtf,.html,.htm,.zip,.rar,.7z,.tar,.gz,.mp3,.mp4,.avi,.mov,.mkv,.wav,.flac,.ogg,.json,.xml,.md,.epub,.mobi,.azw3,.cbz,.cbr,.xps,.ps,.tex,.log,.tex,.pages,.key,.numbers,.heic,.tiff,.tif,.psd,.ai,.indd,.dwg,.dxf,.skp,.blend,.fbx,.obj,.stl,.3ds,.dae,.ply,.gltf,.glb,.usdz,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct">
-        <div class="flex flex-col gap-2 w-full">
-            <label class="font-medium">Quiz Type:</label>
-            <div class="flex gap-6">
-                <label class="inline-flex items-center">
-                    <input type="radio" name="quiz_type" value="flashcards" class="form-radio" checked>
-                    <span class="ml-2">Make Flash Cards</span>
-                </label>
-                <label class="inline-flex items-center">
-                    <input type="radio" name="quiz_type" value="multiple_choice" class="form-radio">
-                    <span class="ml-2">Make Multiple Choice</span>
-                </label>
+<!-- Upload Section -->
+<section class="max-w-4xl mx-auto px-4 py-12">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Create Your Quiz</h2>
+            <p class="text-gray-600">Upload your documents and configure your quiz settings</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" id="quizForm" class="space-y-8">
+            {% csrf_token %}
+            
+            <!-- File Upload Section -->
+            <div class="space-y-4">
+                <label class="block text-lg font-semibold text-gray-700">Upload Documents</label>
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+                    <div class="mb-4">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="mb-4">
+                        <label for="file-upload" class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+                            Choose Files
+                        </label>
+                        <input 
+                            id="file-upload" 
+                            name="upload_files" 
+                            type="file" 
+                            multiple 
+                            accept=".pdf,.ppt,.pptx,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif,.bmp,.svg,.webp,.odt,.odp,.xls,.xlsx,.csv,.rtf,.html,.htm,.zip,.rar,.7z,.tar,.gz,.mp3,.mp4,.avi,.mov,.mkv,.wav,.flac,.ogg,.json,.xml,.md,.epub,.mobi,.azw3,.cbz,.cbr,.xps,.ps,.tex,.log,.tex,.pages,.key,.numbers,.heic,.tiff,.tif,.psd,.ai,.indd,.dwg,.dxf,.skp,.blend,.fbx,.obj,.stl,.3ds,.dae,.ply,.gltf,.glb,.usdz,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct,.iges,.step,.stp,.sldprt,.sldasm,.prt,.asm,.catpart,.catproduct"
+                            class="hidden"
+                            required
+                        >
+                    </div>
+                    <p class="text-sm text-gray-500">PDF, PPTX, DOCX, TXT, and many more formats supported</p>
+                    <div id="file-list" class="mt-4 text-left hidden">
+                        <h4 class="font-medium text-gray-700 mb-2">Selected Files:</h4>
+                        <ul id="file-items" class="space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Configuration -->
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Quiz Type Selection -->
+                <div class="space-y-4">
+                    <label class="block text-lg font-semibold text-gray-700">Quiz Type</label>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                            <input type="radio" name="quiz_type" value="flashcards" class="h-4 w-4 text-blue-600 focus:ring-blue-500" checked>
+                            <div class="ml-3">
+                                <div class="font-medium text-gray-700">Flashcards</div>
+                                <div class="text-sm text-gray-500">Question and answer pairs for memorization</div>
+                            </div>
+                        </label>
+                        <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                            <input type="radio" name="quiz_type" value="multiple_choice" class="h-4 w-4 text-blue-600 focus:ring-blue-500">
+                            <div class="ml-3">
+                                <div class="font-medium text-gray-700">Multiple Choice</div>
+                                <div class="text-sm text-gray-500">Questions with 4 answer options</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Number of Questions -->
+                <div class="space-y-4">
+                    <label for="num_questions" class="block text-lg font-semibold text-gray-700">Number of Questions</label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            name="num_questions" 
+                            id="num_questions" 
+                            min="1" 
+                            max="50" 
+                            value="10" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                            <span class="text-gray-500 text-sm">questions</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-500">Choose between 1-50 questions</p>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+                >
+                    <span id="submitText">Generate Quiz</span>
+                    <span id="loadingText" class="hidden">
+                        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Generating Quiz...
+                    </span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mt-8 space-y-4">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% elif message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700{% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Uploaded Files Display -->
+        {% if uploaded_files %}
+            <div class="mt-8 p-6 bg-gray-50 rounded-lg">
+                <h3 class="text-lg font-semibold mb-4">Uploaded Files:</h3>
+                <ul class="space-y-2">
+                    {% for file in uploaded_files %}
+                        <li class="flex items-center text-gray-700">
+                            <svg class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                            {{ file }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="bg-gray-50 py-16">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">How It Works</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">1. Upload Documents</h3>
+                <p class="text-gray-600">Upload your PDF, PPTX, DOCX, or other document formats</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">2. AI Processing</h3>
+                <p class="text-gray-600">Our AI analyzes your content and generates relevant questions</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">3. Take Quiz</h3>
+                <p class="text-gray-600">Practice with your personalized quiz and track your progress</p>
             </div>
         </div>
-        <div class="flex flex-col gap-2 w-full">
-            <label for="num_questions" class="font-medium">Number of Questions:</label>
-            <input type="number" name="num_questions" id="num_questions" min="1" max="100" value="10" class="border rounded px-3 py-2 w-32">
-        </div>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-300 ease-in-out">Confirm</button>
-    </form>
-    {% if uploaded_files %}
-        <div class="mt-6">
-            <h3 class="text-lg font-medium mb-2">Uploaded Files:</h3>
-            <ul class="list-disc list-inside text-left">
-                {% for file in uploaded_files %}
-                    <li>{{ file }}</li>
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+    </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('file-upload');
+    const fileList = document.getElementById('file-list');
+    const fileItems = document.getElementById('file-items');
+    const form = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const loadingText = document.getElementById('loadingText');
+
+    // File upload handling
+    fileInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        if (files.length > 0) {
+            fileList.classList.remove('hidden');
+            fileItems.innerHTML = '';
+            
+            files.forEach(file => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center text-sm text-gray-600';
+                li.innerHTML = `
+                    <svg class="h-4 w-4 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
+                    </svg>
+                    ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+                `;
+                fileItems.appendChild(li);
+            });
+        } else {
+            fileList.classList.add('hidden');
+        }
+    });
+
+    // Form submission handling
+    form.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+    });
+});
+</script>
 {% endblock content %} 
