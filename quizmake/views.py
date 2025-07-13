@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
@@ -30,25 +29,30 @@ def quizmakerhome(request):
                 messages.error(request, 'Please upload at least one file.')
                 return render(request, 'quizmake/quizmakerhome.html')
             
-                        # Process uploaded files and generate title
+            # Create quiz with placeholder title (will update after file processing)
+            quiz = Quiz.objects.create(
+                user=request.user,
+                title="New Quiz", # Title will be generated from files
+                quiz_type=quiz_type,
+                num_questions=num_questions
+            )
+            
+            # Process uploaded files and generate title
             all_text_content = ""
             file_names = []
-            saved_files = []  # Store file info for later UploadedFile creation
             
             for uploaded_file in uploaded_files:
-                # Save file
-                fs = FileSystemStorage()
-                filename = fs.save(uploaded_file.name, uploaded_file)
-                file_path = fs.path(filename)
+                # Save file using UploadedFile model (stores in quiz_files/)
+                uploaded_file_instance = UploadedFile.objects.create(
+                    quiz=quiz,
+                    file=uploaded_file,  # This will save to 'quiz_files/' automatically
+                    filename=uploaded_file.name,
+                    file_size=uploaded_file.size
+                )
+                file_path = uploaded_file_instance.file.path
                 
                 # Store filename for title generation
                 file_names.append(uploaded_file.name)
-                saved_files.append({
-                    'file': uploaded_file,
-                    'filename': uploaded_file.name,
-                    'file_size': uploaded_file.size,
-                    'file_path': file_path
-                })
                 
                 # Extract text from file
                 try:
@@ -73,22 +77,9 @@ def quizmakerhome(request):
                 else:
                     quiz_title = f"{first_file} & {len(file_names)-1} more files Quiz"
             
-            # Create quiz with generated title
-            quiz = Quiz.objects.create(
-                user=request.user,
-                title=quiz_title,
-                quiz_type=quiz_type,
-                num_questions=num_questions
-            )
-            
-            # Create UploadedFile records after quiz is created
-            for file_info in saved_files:
-                UploadedFile.objects.create(
-                    quiz=quiz,
-                    file=file_info['file'],
-                    filename=file_info['filename'],
-                    file_size=file_info['file_size']
-                )
+            # Update quiz title after all files are processed
+            quiz.title = quiz_title
+            quiz.save()
             
             if not all_text_content.strip():
                 messages.error(request, 'No text content could be extracted from the uploaded files.')
@@ -295,30 +286,15 @@ def my_quizzes(request):
 
 @login_required
 def delete_quiz(request, quiz_id):
-    """Delete a quiz and its associated files"""
+    """Delete a quiz and its associated files (files deleted via model signals)"""
     quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
     
     if request.method == 'POST':
         try:
-            # Get all uploaded files for this quiz
-            uploaded_files = quiz.uploaded_files.all()
-            
-            # Delete the physical files from the filesystem
-            for uploaded_file in uploaded_files:
-                try:
-                    if uploaded_file.file:
-                        # Get the file path and delete the file
-                        file_path = uploaded_file.file.path
-                        if os.path.exists(file_path):
-                            os.remove(file_path)
-                            logger.info(f"Deleted file: {file_path}")
-                except Exception as e:
-                    logger.error(f"Error deleting file {uploaded_file.filename}: {e}")
-            
             # Store quiz title for confirmation message
             quiz_title = quiz.title
             
-            # Delete the quiz (this will cascade delete related objects)
+            # Delete the quiz (this will cascade delete related objects and files via signals)
             quiz.delete()
             
             messages.success(request, f'Quiz "{quiz_title}" has been deleted successfully.')
