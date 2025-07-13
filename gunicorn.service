@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn daemon for Django simpleApp1
+After=network.target
+
+[Service]
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/simpleApp1
+Environment="PATH=/home/ubuntu/simpleApp1/venv/bin"
+ExecStart=/home/ubuntu/simpleApp1/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 simpleApp1.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target 
