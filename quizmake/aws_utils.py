@@ -94,19 +94,23 @@ Instructions:
 5. Keep answers concise but complete
 6. Ensure questions are relevant to the provided content
 
-IMPORTANT: You must respond with ONLY valid JSON. Do not include any other text before or after the JSON.
+CRITICAL: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or code blocks. Start your response with {{ and end with }}.
 
-Format your response as valid JSON only:
+Required JSON format:
 {{
     "flashcards": [
         {{
-            "question": "Question text here",
-            "answer": "Answer text here"
+            "question": "What is the main topic of this section?",
+            "answer": "The main topic is..."
+        }},
+        {{
+            "question": "Define the key concept mentioned.",
+            "answer": "The key concept is..."
         }}
     ]
 }}
 
-Generate the flashcards now:"""
+Respond with ONLY the JSON object:"""
         else:  # multiple_choice
             prompt_template = f"""You are an expert educator creating multiple choice questions from educational content. Based on the following text, create exactly {num_questions} high-quality multiple choice questions.
 
@@ -122,25 +126,25 @@ Instructions:
 6. Ensure all distractors (wrong answers) are plausible
 7. Ensure questions are relevant to the provided content
 
-IMPORTANT: You must respond with ONLY valid JSON. Do not include any other text before or after the JSON.
+CRITICAL: You must respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, or code blocks. Start your response with {{ and end with }}.
 
-Format your response as valid JSON only:
+Required JSON format:
 {{
     "questions": [
         {{
-            "question": "Question text here",
+            "question": "What is the main topic discussed?",
             "options": {{
-                "A": "Option A",
-                "B": "Option B", 
-                "C": "Option C",
-                "D": "Option D"
+                "A": "Option A text",
+                "B": "Option B text", 
+                "C": "Option C text",
+                "D": "Option D text"
             }},
             "correct_answer": "A"
         }}
     ]
 }}
 
-Generate the questions now:"""
+Respond with ONLY the JSON object:"""
         return prompt_template
     
     def _parse_questions(self, generated_text, quiz_type):
@@ -148,6 +152,7 @@ Generate the questions now:"""
         try:
             # Clean the response text
             generated_text = generated_text.strip()
+            logger.debug(f"Raw generated text: {generated_text[:500]}...")
             
             # Try to find JSON in the response
             json_start = generated_text.find('{')
@@ -171,27 +176,78 @@ Generate the questions now:"""
                     else:
                         raise ValueError("No JSON found in response")
                 else:
-                    raise ValueError("No JSON found in response")
+                    # Try to extract JSON-like content
+                    lines = generated_text.split('\n')
+                    json_lines = []
+                    in_json = False
+                    for line in lines:
+                        if '{' in line or in_json:
+                            in_json = True
+                            json_lines.append(line)
+                        if '}' in line and in_json:
+                            break
+                    if json_lines:
+                        json_str = '\n'.join(json_lines)
+                    else:
+                        raise ValueError("No JSON found in response")
             else:
                 json_str = generated_text[json_start:json_end]
+            
+            logger.debug(f"Extracted JSON string: {json_str[:500]}...")
             
             # Parse JSON
             data = json.loads(json_str)
             
             if quiz_type == 'flashcards':
                 flashcards = data.get('flashcards', [])
+                if not flashcards:
+                    # Try alternative key names
+                    flashcards = data.get('questions', [])
+                    if not flashcards:
+                        flashcards = data.get('cards', [])
+                
                 # Validate flashcards structure
-                for flashcard in flashcards:
-                    if not flashcard.get('question') or not flashcard.get('answer'):
-                        raise ValueError("Invalid flashcard structure")
-                return flashcards
+                valid_flashcards = []
+                for i, flashcard in enumerate(flashcards):
+                    if isinstance(flashcard, dict):
+                        question = flashcard.get('question', flashcard.get('front', ''))
+                        answer = flashcard.get('answer', flashcard.get('back', ''))
+                        if question and answer:
+                            valid_flashcards.append({
+                                'question': question,
+                                'answer': answer
+                            })
+                        else:
+                            logger.warning(f"Flashcard {i} missing question or answer: {flashcard}")
+                    else:
+                        logger.warning(f"Flashcard {i} is not a dictionary: {flashcard}")
+                
+                if not valid_flashcards:
+                    raise ValueError("No valid flashcards found in response")
+                
+                logger.info(f"Successfully parsed {len(valid_flashcards)} flashcards")
+                return valid_flashcards
             else:
                 questions = data.get('questions', [])
                 # Validate questions structure
-                for question in questions:
-                    if not question.get('question') or not question.get('options') or not question.get('correct_answer'):
-                        raise ValueError("Invalid question structure")
-                return questions
+                valid_questions = []
+                for i, question in enumerate(questions):
+                    if isinstance(question, dict):
+                        q_text = question.get('question', '')
+                        options = question.get('options', {})
+                        correct = question.get('correct_answer', '')
+                        if q_text and options and correct:
+                            valid_questions.append(question)
+                        else:
+                            logger.warning(f"Question {i} missing required fields: {question}")
+                    else:
+                        logger.warning(f"Question {i} is not a dictionary: {question}")
+                
+                if not valid_questions:
+                    raise ValueError("No valid questions found in response")
+                
+                logger.info(f"Successfully parsed {len(valid_questions)} questions")
+                return valid_questions
                 
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse JSON response: {e}")
@@ -199,6 +255,7 @@ Generate the questions now:"""
             raise Exception("Failed to parse AI response - invalid JSON format")
         except Exception as e:
             logger.error(f"Error parsing questions: {e}")
+            logger.error(f"Generated text: {generated_text}")
             raise
 
 class DocumentProcessor:

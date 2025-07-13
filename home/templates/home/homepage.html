@@ -1,36 +1,189 @@
 {% extends "home/base.html" %}
 {% load static %}
 {% block content %}
-<section class="text-center bg-white p-10 rounded-lg shadow-lg">
-    <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to your useful webapp.</h1>
-    <p class="text-lg text-gray-600 mb-8">It provides amazing features.</p>
-    <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow transition duration-300 ease-in-out">
-        Learn More
-    </a>
-</section>
-</br>
-<section class="text-center bg-white p-8 rounded-lg shadow">
-    <div>
-        <h2 class="text-xl font-semibold mb-2"> Select one of the following apps</h2>
+
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white py-20 rounded-xl shadow-2xl mb-16">
+    <div class="absolute inset-0 bg-black opacity-10 rounded-xl"></div>
+    <div class="relative z-10 max-w-4xl mx-auto text-center px-6">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Your Personal
+            <span class="text-yellow-300">Productivity Hub</span>
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 opacity-90 leading-relaxed">
+            Transform your learning and health tracking with AI-powered tools designed for modern life
+        </p>
+        <div class="flex flex-wrap justify-center gap-4 text-sm">
+            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">AI-Powered</span>
+            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">Smart Learning</span>
+            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">Health Tracking</span>
+            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full backdrop-blur-sm">Easy to Use</span>
+        </div>
     </div>
 </section>
 
-<section class="mt-12 grid md:grid-cols-3 gap-8">
-    <div class="bg-white p-6 rounded-lg shadow">
-        <a href="{% url 'weighttrackerhome' %}">
-            <h2 class="text-xl font-semibold mb-2">Weight Tracker</h2>
-            <p class="text-gray-600">This app allows you to track your weight.</p>
-        </a>
-        </div>
-    <div class="bg-white p-6 rounded-lg shadow">
-        <a href="{% url 'quizmakerhome' %}">
-            <h2 class="text-xl font-semibold mb-2">Quiz Make</h2>
-            <p class="text-gray-600">This app allows you to make a quick pratice Quiz.</p>
-        </a>
+<!-- Features Overview -->
+<section class="mb-16">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Powerful Tools for Your Success</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Choose from our suite of intelligent applications designed to enhance your productivity and learning experience
+        </p>
     </div>
-    <div class="bg-white p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-2">Feature Three</h2>
-        <p class="text-gray-600">Description of the third incredible feature.</p>
+
+    <!-- App Cards -->
+    <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <!-- Weight Tracker Card -->
+        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-8 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Health & Fitness</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Weight Tracker</h3>
+                <p class="opacity-90">Monitor your health journey with detailed analytics and progress tracking</p>
+            </div>
+            <div class="p-8">
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Visual progress charts and trends
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Goal setting and achievement tracking
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Historical data analysis
+                    </div>
+                </div>
+                <a href="{% url 'weighttrackerhome' %}" class="block w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-xl text-center transition duration-300 transform hover:scale-105">
+                    Start Tracking
+                </a>
+            </div>
+        </div>
+
+        <!-- Quiz Maker Card -->
+        <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-8 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-16 h-16 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">AI Learning</span>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Quiz Maker</h3>
+                <p class="opacity-90">Create personalized quizzes from your documents using advanced AI technology</p>
+            </div>
+            <div class="p-8">
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        AI-powered question generation
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Multiple file format support
+                    </div>
+                    <div class="flex items-center text-gray-600">
+                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        Flashcards and multiple choice
+                    </div>
+                </div>
+                <a href="{% url 'quizmakerhome' %}" class="block w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl text-center transition duration-300 transform hover:scale-105">
+                    Create Quiz
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="bg-gray-50 rounded-2xl p-12 mb-16">
+    <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">How It Works</h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+            Get started in minutes with our intuitive and powerful applications
+        </p>
+    </div>
+    
+    <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-blue-600">1</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Choose Your App</h3>
+            <p class="text-gray-600">Select from our suite of productivity tools designed for your specific needs</p>
+        </div>
+        <div class="text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-green-600">2</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Get Started</h3>
+            <p class="text-gray-600">Follow simple setup instructions and begin using your chosen application</p>
+        </div>
+        <div class="text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-purple-600">3</span>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Track Progress</h3>
+            <p class="text-gray-600">Monitor your achievements and see your progress over time</p>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="mb-16">
+    <div class="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
+            <div class="text-3xl font-bold text-blue-600 mb-2">2</div>
+            <div class="text-gray-600">Powerful Apps</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
+            <div class="text-3xl font-bold text-green-600 mb-2">AI</div>
+            <div class="text-gray-600">Powered Learning</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
+            <div class="text-3xl font-bold text-purple-600 mb-2">24/7</div>
+            <div class="text-gray-600">Available</div>
+        </div>
+        <div class="bg-white rounded-xl p-6 text-center shadow-lg">
+            <div class="text-3xl font-bold text-indigo-600 mb-2">100%</div>
+            <div class="text-gray-600">Free to Use</div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-12 text-center text-white">
+    <h2 class="text-3xl md:text-4xl font-bold mb-4">Ready to Get Started?</h2>
+    <p class="text-xl mb-8 opacity-90">Join thousands of users who are already improving their productivity</p>
+    <div class="flex flex-wrap justify-center gap-4">
+        <a href="{% url 'weighttrackerhome' %}" class="bg-white text-indigo-600 hover:bg-gray-100 font-semibold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105">
+            Start Weight Tracking
+        </a>
+        <a href="{% url 'quizmakerhome' %}" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-8 rounded-xl transition duration-300 transform hover:scale-105">
+            Create Your First Quiz
+        </a>
     </div>
 </section>
 

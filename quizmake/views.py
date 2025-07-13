@@ -30,29 +30,25 @@ def quizmakerhome(request):
                 messages.error(request, 'Please upload at least one file.')
                 return render(request, 'quizmake/quizmakerhome.html')
             
-            # Create quiz
-            quiz = Quiz.objects.create(
-                user=request.user,
-                title=f"Quiz from {len(uploaded_files)} file(s)",
-                quiz_type=quiz_type,
-                num_questions=num_questions
-            )
-            
-            # Process uploaded files
+                        # Process uploaded files and generate title
             all_text_content = ""
+            file_names = []
+            saved_files = []  # Store file info for later UploadedFile creation
+            
             for uploaded_file in uploaded_files:
                 # Save file
                 fs = FileSystemStorage()
                 filename = fs.save(uploaded_file.name, uploaded_file)
                 file_path = fs.path(filename)
                 
-                # Create UploadedFile record
-                UploadedFile.objects.create(
-                    quiz=quiz,
-                    file=uploaded_file,
-                    filename=uploaded_file.name,
-                    file_size=uploaded_file.size
-                )
+                # Store filename for title generation
+                file_names.append(uploaded_file.name)
+                saved_files.append({
+                    'file': uploaded_file,
+                    'filename': uploaded_file.name,
+                    'file_size': uploaded_file.size,
+                    'file_path': file_path
+                })
                 
                 # Extract text from file
                 try:
@@ -62,6 +58,37 @@ def quizmakerhome(request):
                 except Exception as e:
                     logger.error(f"Error extracting text from {uploaded_file.name}: {e}")
                     messages.warning(request, f"Could not extract text from {uploaded_file.name}")
+            
+            # Generate quiz title based on uploaded files
+            if len(file_names) == 1:
+                # Single file: use the filename without extension
+                base_name = os.path.splitext(file_names[0])[0]
+                quiz_title = f"{base_name} Quiz"
+            else:
+                # Multiple files: use first filename + "and X more"
+                first_file = os.path.splitext(file_names[0])[0]
+                if len(file_names) == 2:
+                    second_file = os.path.splitext(file_names[1])[0]
+                    quiz_title = f"{first_file} & {second_file} Quiz"
+                else:
+                    quiz_title = f"{first_file} & {len(file_names)-1} more files Quiz"
+            
+            # Create quiz with generated title
+            quiz = Quiz.objects.create(
+                user=request.user,
+                title=quiz_title,
+                quiz_type=quiz_type,
+                num_questions=num_questions
+            )
+            
+            # Create UploadedFile records after quiz is created
+            for file_info in saved_files:
+                UploadedFile.objects.create(
+                    quiz=quiz,
+                    file=file_info['file'],
+                    filename=file_info['filename'],
+                    file_size=file_info['file_size']
+                )
             
             if not all_text_content.strip():
                 messages.error(request, 'No text content could be extracted from the uploaded files.')
@@ -75,32 +102,105 @@ def quizmakerhome(request):
                     all_text_content, quiz_type, num_questions
                 )
                 
-                # Save generated questions
-                for i, question_data in enumerate(generated_questions):
-                    if quiz_type == 'flashcards':
-                        Question.objects.create(
-                            quiz=quiz,
-                            question_text=question_data.get('question', ''),
-                            answer_text=question_data.get('answer', ''),
-                            order=i + 1
-                        )
-                    else:  # multiple_choice
-                        Question.objects.create(
-                            quiz=quiz,
-                            question_text=question_data.get('question', ''),
-                            options=question_data.get('options', {}),
-                            correct_answer=question_data.get('correct_answer', ''),
-                            order=i + 1
-                        )
+                if not generated_questions:
+                    raise Exception("No questions were generated")
                 
-                messages.success(request, f'Successfully generated {len(generated_questions)} questions!')
+                # Save generated questions
+                questions_created = 0
+                for i, question_data in enumerate(generated_questions):
+                    try:
+                        if quiz_type == 'flashcards':
+                            Question.objects.create(
+                                quiz=quiz,
+                                question_text=question_data.get('question', ''),
+                                answer_text=question_data.get('answer', ''),
+                                order=i + 1
+                            )
+                        else:  # multiple_choice
+                            Question.objects.create(
+                                quiz=quiz,
+                                question_text=question_data.get('question', ''),
+                                options=question_data.get('options', {}),
+                                correct_answer=question_data.get('correct_answer', ''),
+                                order=i + 1
+                            )
+                        questions_created += 1
+                    except Exception as qe:
+                        logger.warning(f"Failed to save question {i}: {qe}")
+                        continue
+                
+                if questions_created == 0:
+                    raise Exception("Failed to save any questions")
+                
+                messages.success(request, f'Successfully generated {questions_created} questions!')
                 return redirect('quiz_detail', quiz_id=quiz.id)
                 
             except Exception as e:
                 logger.error(f"Error generating questions: {e}")
-                messages.error(request, f'Failed to generate questions: {str(e)}')
-                quiz.delete()
-                return render(request, 'quizmake/quizmakerhome.html')
+                error_msg = str(e)
+                if "Invalid flashcard structure" in error_msg:
+                    error_msg = "The AI generated questions in an invalid format. Please try again with different content or settings."
+                elif "Failed to parse AI response" in error_msg:
+                    error_msg = "The AI response could not be processed. Please try again."
+                elif "No questions were generated" in error_msg:
+                    error_msg = "No questions could be generated from the provided content. Please try with different content or fewer questions."
+                else:
+                    error_msg = f"Failed to generate questions: {error_msg}"
+                
+                messages.error(request, error_msg)
+                
+                # Try to create some basic questions as fallback
+                try:
+                    logger.info("Attempting to create fallback questions")
+                    fallback_questions = []
+                    if quiz_type == 'flashcards':
+                        # Create simple flashcards based on file content
+                        lines = all_text_content.split('\n')
+                        content_lines = [line.strip() for line in lines if line.strip() and len(line.strip()) > 20]
+                        
+                        for i in range(min(5, len(content_lines), num_questions)):
+                            if i < len(content_lines):
+                                line = content_lines[i]
+                                words = line.split()
+                                if len(words) > 5:
+                                    question = f"What is the main point about: {' '.join(words[:5])}..."
+                                    answer = line[:100] + "..." if len(line) > 100 else line
+                                    
+                                    Question.objects.create(
+                                        quiz=quiz,
+                                        question_text=question,
+                                        answer_text=answer,
+                                        order=i + 1
+                                    )
+                                    fallback_questions.append(i + 1)
+                    else:
+                        # Create simple multiple choice questions
+                        for i in range(min(3, num_questions)):
+                            Question.objects.create(
+                                quiz=quiz,
+                                question_text=f"Question {i+1} about the uploaded content",
+                                options={
+                                    "A": "Option A",
+                                    "B": "Option B", 
+                                    "C": "Option C",
+                                    "D": "Option D"
+                                },
+                                correct_answer="A",
+                                order=i + 1
+                            )
+                            fallback_questions.append(i + 1)
+                    
+                    if fallback_questions:
+                        messages.warning(request, f'AI generation failed, but created {len(fallback_questions)} basic questions as fallback. You can edit them later.')
+                        return redirect('quiz_detail', quiz_id=quiz.id)
+                    else:
+                        quiz.delete()
+                        return render(request, 'quizmake/quizmakerhome.html')
+                        
+                except Exception as fallback_error:
+                    logger.error(f"Fallback question creation also failed: {fallback_error}")
+                    quiz.delete()
+                    return render(request, 'quizmake/quizmakerhome.html')
                 
         except Exception as e:
             logger.error(f"Error in quiz creation: {e}")
@@ -192,6 +292,45 @@ def my_quizzes(request):
         'quizzes': quizzes,
     }
     return render(request, 'quizmake/my_quizzes.html', context)
+
+@login_required
+def delete_quiz(request, quiz_id):
+    """Delete a quiz and its associated files"""
+    quiz = get_object_or_404(Quiz, id=quiz_id, user=request.user)
+    
+    if request.method == 'POST':
+        try:
+            # Get all uploaded files for this quiz
+            uploaded_files = quiz.uploaded_files.all()
+            
+            # Delete the physical files from the filesystem
+            for uploaded_file in uploaded_files:
+                try:
+                    if uploaded_file.file:
+                        # Get the file path and delete the file
+                        file_path = uploaded_file.file.path
+                        if os.path.exists(file_path):
+                            os.remove(file_path)
+                            logger.info(f"Deleted file: {file_path}")
+                except Exception as e:
+                    logger.error(f"Error deleting file {uploaded_file.filename}: {e}")
+            
+            # Store quiz title for confirmation message
+            quiz_title = quiz.title
+            
+            # Delete the quiz (this will cascade delete related objects)
+            quiz.delete()
+            
+            messages.success(request, f'Quiz "{quiz_title}" has been deleted successfully.')
+            return redirect('my_quizzes')
+            
+        except Exception as e:
+            logger.error(f"Error deleting quiz {quiz_id}: {e}")
+            messages.error(request, f'Failed to delete quiz: {str(e)}')
+            return redirect('my_quizzes')
+    
+    # If not POST, redirect to my_quizzes
+    return redirect('my_quizzes')
 
 @csrf_exempt
 def generate_questions_ajax(request):
