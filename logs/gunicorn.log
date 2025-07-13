@@ -1,0 +1,12 @@
+Failed to read config file: /home/ec2-user/simpleApp1/gunicorn.conf.py
+Traceback (most recent call last):
+  File "/home/ec2-user/simpleApp1/venv/lib64/python3.9/site-packages/gunicorn/app/base.py", line 110, in get_config_from_filename
+    spec.loader.exec_module(mod)
+  File "<frozen importlib._bootstrap_external>", line 846, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 983, in get_code
+  File "<frozen importlib._bootstrap_external>", line 913, in source_to_code
+  File "<frozen importlib._bootstrap>", line 228, in _call_with_frames_removed
+  File "/home/ec2-user/simpleApp1/gunicorn.conf.py", line 2
+    workers = 3
+               ^
+SyntaxError: EOL while scanning string literal
