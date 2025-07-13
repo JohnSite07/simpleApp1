@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 # Create your views here.
 def homepage(request):
     context = {}
-    return render(request, "home\homepage.html", context)
+    return render(request, "home/homepage.html", context)
 
 def register(request):
     if request.method == 'POST':
