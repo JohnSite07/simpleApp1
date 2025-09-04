@@ -1,3 +1,4 @@
+
 """
 Django settings for simpleApp1 project.
 
