@@ -32,5 +32,16 @@
         "**/__pycache__": true,
         "**/*.pyc": true,
         "**/migrations": false
-    }
+    },
+    "python.languageServer": "None",
+    "cursorpyright.analysis.autoImportCompletions": true,
+    "cursorpyright.analysis.autoSearchPaths": true,
+    "cursorpyright.analysis.diagnosticMode": "workspace",
+    "cursorpyright.analysis.extraPaths": [
+        "./simpleApp1",
+        "./home",
+        "./weighttracker"
+    ],
+    "cursorpyright.analysis.stubPath": "./typings",
+    "cursorpyright.analysis.typeCheckingMode": "basic"
 } 
